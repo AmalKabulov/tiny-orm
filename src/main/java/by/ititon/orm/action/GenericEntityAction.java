@@ -1,29 +1,26 @@
-package by.ititon.orm.processor;
+package by.ititon.orm.action;
 
 import by.ititon.orm.annotation.Column;
 import by.ititon.orm.annotation.Id;
 import by.ititon.orm.annotation.Table;
 import by.ititon.orm.testEntity.TestEntity;
-import by.ititon.orm.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class GenericQueryProcessor {
+public class GenericEntityAction {
 
     public static void main(String[] args) {
 
         TestEntity testEntity = new TestEntity(1L, "AMAL", "KABULOV");
-        GenericQueryProcessor genericQueryProcessor = new GenericQueryProcessor();
-        genericQueryProcessor.genericInsertUpdateQueryStatementCreator(testEntity);
+        GenericEntityAction genericEntityAction = new GenericEntityAction();
+//        genericEntityAction.genericInsertUpdateQueryStatementCreator(testEntity);
 
-        genericQueryProcessor.genericFindAllStatementQueryCreator(testEntity);
-        genericQueryProcessor.genericFindByIdStatementQueryCreator(1, testEntity.getClass());
+        genericEntityAction.genericFindAllStatementQueryCreator(testEntity);
+        genericEntityAction.genericFindByIdStatementQueryCreator(1, testEntity.getClass());
     }
 
 
@@ -72,37 +69,37 @@ public class GenericQueryProcessor {
     }
 
 
-    public void genericInsertUpdateQueryStatementCreator(final Object object) {
-
-        Map<String, String> columnNameValues = new LinkedHashMap<>();
-
-        Class<?> objClass = object.getClass();
-
-        Field[] declaredFields = objClass.getDeclaredFields();
-
-        String tableName = objClass.getAnnotation(Table.class).name();
-
-
-        for (Field field : declaredFields) {
-
-
-            if (field.isAnnotationPresent(Column.class)) {
-
-                Method method = ReflectionUtil.getMethod(objClass, "get" + capitalizeFirstLetter(field.getName()));
-
-                String columnName = field.getAnnotation(Column.class).name();
-                String columnValue = wrap(String.valueOf(ReflectionUtil.invokeMethod(object, method)));
-
-                columnNameValues.put(columnName, columnValue);
-            }
-
-        }
-
-
-        System.out.println(buildInsertQuery(tableName, columnNameValues));
-
-        System.out.println(buildUpdateQuery(tableName, columnNameValues));
-    }
+//    public void genericInsertUpdateQueryStatementCreator(final Object object) {
+//
+//        Map<String, String> columnNameValues = new LinkedHashMap<>();
+//
+//        Class<?> objClass = object.getClass();
+//
+//        Field[] declaredFields = objClass.getDeclaredFields();
+//
+//        String tableName = objClass.getAnnotation(Table.class).name();
+//
+//
+//        for (Field field : declaredFields) {
+//
+//
+//            if (field.isAnnotationPresent(Column.class)) {
+//
+//                Method method = ReflectionUtil.getMethod(objClass, "get" + capitalizeFirstLetter(field.getName()));
+//
+//                String columnName = field.getAnnotation(Column.class).name();
+//                String columnValue = wrap(String.valueOf(ReflectionUtil.invokeMethod(object, method)));
+//
+//                columnNameValues.put(columnName, columnValue);
+//            }
+//
+//        }
+//
+//
+//        System.out.println(buildInsertQuery(tableName, columnNameValues));
+//
+//        System.out.println(buildUpdateQuery(tableName, columnNameValues));
+//    }
 
 
     private String buildFindByIdQuery(String tableName, List<String> columns, String idColumn, Object idVal) {

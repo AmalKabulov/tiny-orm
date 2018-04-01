@@ -37,4 +37,14 @@ public class ReflectionUtil {
         ParameterizedType genericReturnType = (ParameterizedType) field.getGenericType();
         return genericReturnType.getActualTypeArguments();
     }
+
+
+    public static Object newInstance(String className) {
+
+        try {
+            return newClass(className).getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new ReflectionException("COULD NOT CREATE INSTANCE OF: " + className, e);
+        }
+    }
 }
