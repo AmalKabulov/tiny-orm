@@ -47,4 +47,17 @@ public class ReflectionUtil {
             throw new ReflectionException("COULD NOT CREATE INSTANCE OF: " + className, e);
         }
     }
+
+
+    public static Object invokeGetter(Object object, String fieldName) {
+        Method getter = getMethod(object.getClass(), "get" + capitalizeFirstLetter(fieldName));
+        return ReflectionUtil.invokeMethod(object, getter);
+    }
+
+
+
+
+    private static String capitalizeFirstLetter(String value) {
+        return value.substring(0, 1).toUpperCase() + value.substring(1);
+    }
 }

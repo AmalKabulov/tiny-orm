@@ -74,13 +74,13 @@ public class EntitySelectAction {
             result = doMpWork(depClass, mappedByField, columns, id);
 
         } else {
-            result = doJTWork(depClass, field, columns, id);
+            result = doNoMappedBy(depClass, field, columns, id);
         }
 
         return result;
     }
 
-    public String doJTWork(Class<?> clazz, Field depField, List<String> columns, String mainclassid) {
+    public String doNoMappedBy(Class<?> clazz, Field depField, List<String> columns, String mainclassid) {
 
         Field[] declaredFields = clazz.getDeclaredFields();
         String tableName = clazz.getAnnotation(Table.class).name();
@@ -103,8 +103,6 @@ public class EntitySelectAction {
             if (field.isAnnotationPresent(ManyToMany.class)) {
 
                 String mappedFieldName = field.getAnnotation(ManyToMany.class).mappedBy();
-
-
 
                 if (mappedFieldName.equals(depField.getName())){
 
