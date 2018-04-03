@@ -2,6 +2,7 @@ package by.ititon.orm.action;
 
 import by.ititon.orm.annotation.*;
 
+import by.ititon.orm.metadata.TableMetaData;
 import by.ititon.orm.testEntity.TestEntity;
 import by.ititon.orm.testEntity.TestEntity2;
 import by.ititon.orm.util.ReflectionUtil;
@@ -22,6 +23,9 @@ public class EntitySelectAction {
 
     public void genericFindAllStatementQueryCreator(final Class<?> clazz) {
 
+        TableMetaData mainTable = new TableMetaData();
+        TableMetaData innerTable = new TableMetaData();
+
         List<String> columns = new ArrayList<>();
 
         Field[] declaredFields = clazz.getDeclaredFields();
@@ -38,21 +42,21 @@ public class EntitySelectAction {
                 if (field.isAnnotationPresent(Id.class)) {
                     id = tableName + "." + columnName;
                 }
-                columns.add(tableName + "." + columnName);
+                mainTable.getColumnNames().add(tableName + "." + columnName);
 
             } else if (field.isAnnotationPresent(ManyToMany.class)) {
 
-                joining = manyToManyHandler(field, columns, id);
+                joining = manyToManyHandler(field, innerTable, id);
             }
         }
 
 
-        System.out.println(buildFindAllQuery(tableName, columns, joining));
+        System.out.println(buildFindAllQuery(mainTable, innerTable, joining));
 
     }
 
 
-    public String manyToManyHandler(Field field, List<String> columns, String id) {
+    public String manyToManyHandler(Field field, TableMetaData innerTable, String id) {
 
         String result = null;
 
@@ -65,26 +69,36 @@ public class EntitySelectAction {
         ParameterizedType genericReturnType = (ParameterizedType) field.getGenericType();
         String typeClassName = genericReturnType.getActualTypeArguments()[0].getTypeName();
 
-        Class<?> depClass = ReflectionUtil.newClass(typeClassName);
 
-        String mappedByField = annotation.mappedBy();
+        Class<?> innerTableClass = ReflectionUtil.newClass(typeClassName);
+        innerTable.setMappedTableClass(innerTableClass);
+        String mappedByFieldName = annotation.mappedBy();
 
-        if (mappedByField.length() > 0) {
+//        joinTable.setMappedTableClass(innerTableClass);
 
-            result = doMpWork(depClass, mappedByField, columns, id);
+        if (mappedByFieldName.length() > 0) {
+
+            innerTable.setMappedByFieldName(mappedByFieldName);
+
+            result = findJoinTableByMappedByValue(innerTable,  id);
 
         } else {
-            result = doNoMappedBy(depClass, field, columns, id);
+
+            innerTable.setMappedByField(field);
+
+            result = findJoinTableByFieldName(innerTable,  id);
         }
 
         return result;
     }
 
-    public String doNoMappedBy(Class<?> clazz, Field depField, List<String> columns, String mainclassid) {
-
-        Field[] declaredFields = clazz.getDeclaredFields();
-        String tableName = clazz.getAnnotation(Table.class).name();
+    public String findJoinTableByFieldName (TableMetaData innerTable, String mainclassid) {
+        Class<?> mappedTableClass = innerTable.getMappedTableClass();
+        Field[] declaredFields = mappedTableClass.getDeclaredFields();
+        String tableName = mappedTableClass.getAnnotation(Table.class).name();
         String id = null;
+
+
         String joinTableName = null;
         String joinColumn = null;
         String inverseJoinColumn = null;
@@ -98,19 +112,29 @@ public class EntitySelectAction {
                     id = columnName;
                 }
 
-                columns.add(tableName + "." + columnName);
+                innerTable.getColumnNames().add(tableName + "." + columnName);
             }
             if (field.isAnnotationPresent(ManyToMany.class)) {
 
                 String mappedFieldName = field.getAnnotation(ManyToMany.class).mappedBy();
 
-                if (mappedFieldName.equals(depField.getName())){
+                Field mappedByField = innerTable.getMappedByField();
 
-                    JoinTable annotation = depField.getAnnotation(JoinTable.class);
+                if (mappedFieldName.equals(mappedByField.getName())){
+
+                    JoinTable annotation = mappedByField.getAnnotation(JoinTable.class);
 
                     joinTableName = annotation.name();
-                    joinColumn = annotation.joinColumns()[0].name();
-                    inverseJoinColumn = annotation.inverseJoinColumns()[0].name();
+                    joinColumn = joinTableName + "." + annotation.joinColumns()[0].name();
+                    inverseJoinColumn = joinTableName + "." + annotation.inverseJoinColumns()[0].name();
+
+
+//                    joinTable.setTableName(joinTableName);
+//                    joinTable.getColumnNames().add(joinColumn);
+//                    joinTable.getColumnNames().add(inverseJoinColumn);
+
+//                    joinTableName = annotation.name();
+
                 }
             }
         }
@@ -130,11 +154,13 @@ public class EntitySelectAction {
 
 
 
-    public String doMpWork(Class<?> clazz, String mappedBy, List<String> columns, String mainclassid) {
+    public String findJoinTableByMappedByValue (TableMetaData innerTable, String mainclassid) {
 
-        Field[] declaredFields = clazz.getDeclaredFields();
+        Class<?> mappedTableClass = innerTable.getMappedTableClass();
 
-        String tableName = clazz.getAnnotation(Table.class).name();
+        Field[] declaredFields = mappedTableClass.getDeclaredFields();
+
+        String tableName = mappedTableClass.getAnnotation(Table.class).name();
         String id = null;
         String joinTableName = null;
         String joinColumn = null;
@@ -149,9 +175,9 @@ public class EntitySelectAction {
                     id = columnName;
                 }
 
-                columns.add(tableName + "." + columnName);
+                innerTable.getColumnNames().add(tableName + "." + columnName);
             }
-            if (field.getName().equals(mappedBy)) {
+            if (field.getName().equals(innerTable.getMappedByFieldName())) {
 
                 //TODO may be nullpointer
 
@@ -177,9 +203,13 @@ public class EntitySelectAction {
     }
 
 
-    private String buildFindAllQuery(String tableName, List<String> columns, String joining) {
+    private String buildFindAllQuery(TableMetaData mainTable, TableMetaData innerTable,  String joining) {
+        List<String> columns = new ArrayList<>();
+
+        columns.addAll(mainTable.getColumnNames());
+        columns.addAll(innerTable.getColumnNames());
         String columnNames = String.join(", ", columns);
-        StringBuilder query = new StringBuilder("SELECT ").append(columnNames).append(" FROM ").append(tableName).append("\n");
+        StringBuilder query = new StringBuilder("SELECT ").append(columnNames).append(" FROM ").append(mainTable.getTableName()).append("\n");
         if (joining != null) {
             query.append(joining).append(";");
         }

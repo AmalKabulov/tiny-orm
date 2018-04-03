@@ -7,9 +7,12 @@ import java.util.List;
 
 public class TableMetaData {
 
+    private Class<?> mappedTableClass;
+
     private String tableName;
 
     private String mappedByFieldName;
+
     private Field mappedByField;
 
     private List<String> columnNames = new ArrayList<>();
@@ -69,5 +72,13 @@ public class TableMetaData {
 
     public void setMappedByField(Field mappedByField) {
         this.mappedByField = mappedByField;
+    }
+
+    public Class<?> getMappedTableClass() {
+        return mappedTableClass;
+    }
+
+    public void setMappedTableClass(Class<?> mappedTableClass) {
+        this.mappedTableClass = mappedTableClass;
     }
 }

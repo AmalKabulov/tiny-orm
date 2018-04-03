@@ -26,8 +26,6 @@ public class EntityInsertAction {
 
     public void genericInsertQueryStatementCreator(final Object object) {
 
-        String cascadeInsertQuery = null;
-
         TableMetaData mainTable = new TableMetaData();
         TableMetaData joinTable = new TableMetaData();
         TableMetaData innerTable = new TableMetaData();
@@ -80,43 +78,16 @@ public class EntityInsertAction {
     }
 
 
-    private void complexAssocHandler(Object object, Field objField, TableMetaData joinTable, TableMetaData innerTable) {
+    private void complexAssocHandler(Object object, Field field, TableMetaData joinTable, TableMetaData innerTable) {
 
-        Object result = ReflectionUtil.invokeGetter(object, objField.getName());
+        Object result = ReflectionUtil.invokeGetter(object, field.getName());
 
         if (result != null) {
 
             Collection assocMappedVal = (Collection) result;
 
             if (!assocMappedVal.isEmpty()) {
-//
-//                if (objField.isAnnotationPresent(Cascade.class)) {
-//
-//                    String tableName1 = fieldClass.getAnnotation(Table.class).name();
-//                    innerTable.setTableName(tableName1);
-//
-//                    assocMappedVal.forEach(o -> smthblabla(o, innerTable));
-//
-//                } else {
-//
-//                    ManyToMany annotation = objField.getAnnotation(ManyToMany.class);
-//                    String mappedByField = annotation.mappedBy();
-//
-//                    if (mappedByField.length() > 0) {
-//
-//                        joinTable.setMappedByFieldName(mappedByField);
-//
-//                        assocMappedVal.forEach(o -> findJoinTableByMappedByValue(o, joinTable));
-//
-//                    } else {
-//
-//                        joinTable.setMappedByField(objField);
-//
-//                        assocMappedVal.forEach(o -> findJoinTableByFieldName(o, joinTable));
-//
-//                    }
-
-//                }
+                cascadeHandler(assocMappedVal, field, joinTable, innerTable);
 
             }
 
@@ -124,7 +95,7 @@ public class EntityInsertAction {
 
     }
 
-    public void cascadeHadler(Collection assocMappedVal, Field field, TableMetaData joinTable, TableMetaData innerTable) {
+    private void cascadeHandler(Collection assocMappedVal, Field field, TableMetaData joinTable, TableMetaData innerTable) {
 
         String typeClassName = ReflectionUtil.getFieldGenericType(field)[0].getTypeName();
         Class<?> fieldClass = ReflectionUtil.newClass(typeClassName);
@@ -137,9 +108,13 @@ public class EntityInsertAction {
                String tableName1 = fieldClass.getAnnotation(Table.class).name();
                innerTable.setTableName(tableName1);
 
-               assocMappedVal.forEach(o -> smthblabla(o, innerTable));
+               assocMappedVal.forEach(o -> fillInnerTable(o, innerTable));
+               manyToManyHandler(assocMappedVal, field, joinTable);
            }
 
+        } else {
+
+            manyToManyHandler(assocMappedVal, field, joinTable);
         }
 
     }
@@ -201,16 +176,13 @@ public class EntityInsertAction {
 
     private void findJoinTableByMappedByValue(Object object, TableMetaData tableMetaData) {
 
-
         Class<?> objClass = object.getClass();
 
         Field[] declaredFields = objClass.getDeclaredFields();
 
-
         for (Field field : declaredFields) {
 
             if (field.isAnnotationPresent(Id.class)) {
-
 
                 // TODO id - long change collection
                 String id = String.valueOf(ReflectionUtil.invokeGetter(object, field.getName()));
@@ -229,7 +201,7 @@ public class EntityInsertAction {
         }
     }
 
-    private void smthblabla(Object object, TableMetaData tableMetaData) {
+    private void fillInnerTable(Object object, TableMetaData tableMetaData) {
         StringBuilder columnValues = new StringBuilder("(");
 
         Class<?> objClass = object.getClass();

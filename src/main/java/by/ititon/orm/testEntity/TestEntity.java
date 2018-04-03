@@ -19,7 +19,7 @@ public class TestEntity {
     private String lastname;
 
     @ManyToMany(mappedBy = "testEntities", fetch = FetchType.EAGER)
-//    @Cascade(CascadeType.SAVE)
+    @Cascade(CascadeType.SAVE)
     List<TestEntity2> testEntities2 = new ArrayList<>();
 
     public TestEntity(Long id, String name, String lastname) {
