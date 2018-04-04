@@ -3,9 +3,12 @@ package by.ititon.orm.testEntity;
 import by.ititon.orm.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Table(name = "TEST_ENTITY")
+@Entity
 public class TestEntity {
 
     @Column(name = "ID")
@@ -20,7 +23,12 @@ public class TestEntity {
 
     @ManyToMany(mappedBy = "testEntities", fetch = FetchType.EAGER)
     @Cascade(CascadeType.SAVE)
-    List<TestEntity2> testEntities2 = new ArrayList<>();
+    private List<TestEntity2> testEntities2 = new ArrayList<>();
+
+
+
+    @OneToMany(mappedBy = "testEntity2", fetch = FetchType.EAGER)
+    private Set<TestEntity2> testEntities2s = new HashSet<>();
 
     public TestEntity(Long id, String name, String lastname) {
         this.id = id;

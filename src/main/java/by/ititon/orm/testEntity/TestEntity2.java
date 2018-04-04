@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "TEST_ENTITY_2")
+@Entity
 public class TestEntity2 {
 
 
@@ -21,6 +22,11 @@ public class TestEntity2 {
     @JoinTable(name = "TE_TE2", joinColumns = {@JoinColumn(name = "ID_TE2")},
             inverseJoinColumns = {@JoinColumn(name = "ID_TE")})
     private List<TestEntity> testEntities = new ArrayList<>();
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "test_entity_id")
+    private TestEntity testEntity2;
 
     public TestEntity2(Long id, String auth) {
         this.id = id;
@@ -45,5 +51,21 @@ public class TestEntity2 {
 
     public void setAuth(String auth) {
         this.auth = auth;
+    }
+
+    public List<TestEntity> getTestEntities() {
+        return testEntities;
+    }
+
+    public void setTestEntities(List<TestEntity> testEntities) {
+        this.testEntities = testEntities;
+    }
+
+    public TestEntity getTestEntity2() {
+        return testEntity2;
+    }
+
+    public void setTestEntity2(TestEntity testEntity2) {
+        this.testEntity2 = testEntity2;
     }
 }

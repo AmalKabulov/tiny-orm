@@ -62,6 +62,7 @@ public class EntityInsertAction {
                 .collect(Collectors.toList());
 
         joinTable.setColumnValues(result);
+
         System.out.println(generateComplexInsertQuery(joinTable));
         System.out.println(generateComplexInsertQuery(innerTable));
         System.out.println(generateSoloInsertQuery(mainTable));
@@ -105,6 +106,8 @@ public class EntityInsertAction {
             CascadeType[] cascadeTypes = field.getAnnotation(Cascade.class).value();
            if (isContains(cascadeTypes, CascadeType.SAVE)) {
 
+
+
                String tableName1 = fieldClass.getAnnotation(Table.class).name();
                innerTable.setTableName(tableName1);
 
@@ -127,7 +130,7 @@ public class EntityInsertAction {
 
         if (mappedByField.length() > 0) {
 
-            joinTable.setMappedByFieldName(mappedByField);
+            joinTable.setMappedByValue(mappedByField);
 
             assocMappedVal.forEach(o -> findJoinTableByMappedByValue(o, joinTable));
 
@@ -189,7 +192,7 @@ public class EntityInsertAction {
 
                 tableMetaData.getColumnValues().add(id);
             }
-            if (field.getName().equals(tableMetaData.getMappedByFieldName())) {
+            if (field.getName().equals(tableMetaData.getMappedByValue())) {
 
                 String tableName = field.getAnnotation(JoinTable.class).name();
                 tableMetaData.setTableName(tableName);

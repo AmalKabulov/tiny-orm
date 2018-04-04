@@ -55,6 +55,10 @@ public class ReflectionUtil {
     }
 
 
+    public static Class<?> classFromFieldGenericType(Field field) {
+        String fieldGenericType = ReflectionUtil.getFieldGenericType(field)[0].getTypeName();
+        return ReflectionUtil.newClass(fieldGenericType);
+    }
 
 
     private static String capitalizeFirstLetter(String value) {

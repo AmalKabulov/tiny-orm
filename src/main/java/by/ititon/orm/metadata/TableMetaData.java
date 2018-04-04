@@ -1,17 +1,22 @@
 package by.ititon.orm.metadata;
 
-import java.io.File;
+import by.ititon.orm.action.TableType;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TableMetaData {
 
+    private TableType tableType;
+
     private Class<?> mappedTableClass;
 
     private String tableName;
 
-    private String mappedByFieldName;
+    private String idColumnName;
+
+    private String mappedByValue;
 
     private Field mappedByField;
 
@@ -19,7 +24,9 @@ public class TableMetaData {
 
     private List<String> columnValues = new ArrayList<>();
 
-    private TableMetaData tableMetaData;
+    private List<TableMetaData> innerTables;
+
+    private List<JoinTableMetaData> joinTables;
 
 
     public TableMetaData() {
@@ -50,20 +57,31 @@ public class TableMetaData {
         this.columnValues = columnValues;
     }
 
-    public TableMetaData getTableMetaData() {
-        return tableMetaData;
+
+    public List<TableMetaData> getInnerTables() {
+        return innerTables;
     }
 
-    public void setTableMetaData(TableMetaData tableMetaData) {
-        this.tableMetaData = tableMetaData;
+    public void setInnerTables(List<TableMetaData> innerTables) {
+        this.innerTables = innerTables;
     }
 
-    public String getMappedByFieldName() {
-        return mappedByFieldName;
+    public List<JoinTableMetaData> getJoinTables() {
+        return joinTables;
     }
 
-    public void setMappedByFieldName(String mappedByFieldName) {
-        this.mappedByFieldName = mappedByFieldName;
+    public void setJoinTables(List<JoinTableMetaData> joinTables) {
+        this.joinTables = joinTables;
+    }
+
+
+
+    public String getMappedByValue() {
+        return mappedByValue;
+    }
+
+    public void setMappedByValue(String mappedByValue) {
+        this.mappedByValue = mappedByValue;
     }
 
     public Field getMappedByField() {
@@ -80,5 +98,21 @@ public class TableMetaData {
 
     public void setMappedTableClass(Class<?> mappedTableClass) {
         this.mappedTableClass = mappedTableClass;
+    }
+
+    public String getIdColumnName() {
+        return idColumnName;
+    }
+
+    public void setIdColumnName(String idColumnName) {
+        this.idColumnName = idColumnName;
+    }
+
+    public TableType getTableType() {
+        return tableType;
+    }
+
+    public void setTableType(TableType tableType) {
+        this.tableType = tableType;
     }
 }
