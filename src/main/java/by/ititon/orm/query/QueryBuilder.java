@@ -1,8 +1,7 @@
 package by.ititon.orm.query;
 
 import by.ititon.orm.MetaCache;
-import by.ititon.orm.annotation.JoinTable;
-import by.ititon.orm.annotation.ManyToMany;
+import by.ititon.orm.annotation.*;
 import by.ititon.orm.metadata.EntityMetaData;
 import by.ititon.orm.metadata.FieldMetaData;
 
@@ -82,6 +81,84 @@ public class QueryBuilder {
 
         return stringBuilder.toString();
 
+    }
+
+
+
+    public static String buildOneToOneQuery(Class<?> mainTable, Class<?> innerTable) {
+
+//        if (selectQueriesCache.containsKey(mainTable)) {
+//            return selectQueriesCache.get(mainTable);
+//        }
+
+        List<String> columns = new ArrayList<>();
+
+        EntityMetaData inner = null;
+        String mappedBy = null;
+
+
+
+        EntityMetaData main = MetaCache.getEntityMeta(mainTable);
+        List<FieldMetaData> mainFieldMetaData = main.getFieldMetaData();
+
+
+        for (FieldMetaData field : mainFieldMetaData) {
+
+            if (field.getAnnotations().containsKey(OneToOne.class)) {
+                OneToOne oneToOne = (OneToOne) field.getAnnotations().get(OneToOne.class);
+                mappedBy = oneToOne.mappedBy();
+
+            }
+
+            if (!Objects.equals(field.getColumnName(), null)) {
+
+                columns.add(field.getColumnName());
+            }
+
+        }
+
+        String joinColumnName = null;
+
+        inner = MetaCache.getEntityMeta(innerTable);
+        List<FieldMetaData> innerFieldMetaData = inner.getFieldMetaData();
+
+
+        for (FieldMetaData field : innerFieldMetaData) {
+
+            if (field.getField().getName().equals(mappedBy)) {
+                JoinColumn joinColumn = (JoinColumn) field.getAnnotations().get(JoinColumn.class);
+                joinColumnName = inner.getTableName() + "." + joinColumn.name();
+            }
+
+            if (!Objects.equals(field.getColumnName(), null)) {
+
+                columns.add(field.getColumnName());
+            }
+        }
+
+
+        String allColumns = String.join(", ", columns);
+
+        StringBuilder stringBuilder = new StringBuilder("SELECT ").append(allColumns)
+                .append(" FROM ").append(main.getTableName())
+                .append(" LEFT JOIN ").append(inner.getTableName())
+                .append(" ON ").append(joinColumnName).append(" = ").append(main.getIdColumnName());
+
+
+
+//        selectQueriesCache.put(mainTable, stringBuilder.toString());
+
+        return stringBuilder.toString();
+
+    }
+
+
+
+    public static String buildManyToManyInsertQuery(Object main, EntityMetaData mainMeta, Object inner, EntityMetaData innerMeta) {
+
+
+        ///
+        return null;
     }
 
 

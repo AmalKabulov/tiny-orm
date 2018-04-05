@@ -10,7 +10,6 @@ import by.ititon.orm.util.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,7 +47,9 @@ public class TestSelectAction {
             }
 
             if (fieldAnnotations.containsKey(OneToOne.class)) {
-
+                System.out.println("ONE TO ONE : ");
+                oneToOneHandler(clazz, field);
+                System.out.println();
             }
 
 
@@ -72,8 +73,6 @@ public class TestSelectAction {
         String fieldGenericType = ReflectionUtil.getFieldGenericType(field)[0].getTypeName();
 
         Class<?> innerTableClass = ReflectionUtil.newClass(fieldGenericType);
-
-//        EntityMetaData innerEntityMeta = MetaCache.getEntityMeta(innerTableClass);
 
         if (mappedByValue.length() > 0) {
 
@@ -214,6 +213,37 @@ public class TestSelectAction {
 
 
         System.out.println(stringBuilder.toString());
+
+    }
+
+
+    private void oneToOneHandler(Class<?> main, FieldMetaData fieldMetaData) {
+
+        OneToOne oneToOne = (OneToOne) fieldMetaData.getAnnotations().get(OneToOne.class);
+
+        if (oneToOne.fetch().equals(FetchType.LAZY)) {
+//            System.out.println(QueryBuilder.buildSimpleQuery(main));
+            return;
+        }
+
+        String mappedByValue = oneToOne.mappedBy();
+
+        Class<?> innerTableClass =  fieldMetaData.getField().getType();
+
+
+
+
+        if (mappedByValue.length() > 0) {
+
+            System.out.println(QueryBuilder.buildOneToOneQuery(main, innerTableClass));
+
+        } else {
+
+            System.out.println(QueryBuilder.buildOneToOneQuery(innerTableClass, main));
+
+
+        }
+
 
     }
 }

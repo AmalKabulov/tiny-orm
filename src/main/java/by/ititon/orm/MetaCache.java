@@ -1,7 +1,7 @@
 package by.ititon.orm;
 
-import by.ititon.orm.metadata.FieldMetaData;
 import by.ititon.orm.metadata.EntityMetaData;
+import by.ititon.orm.metadata.FieldMetaData;
 
 import java.util.List;
 import java.util.Map;

@@ -28,6 +28,11 @@ public class TestEntity2 {
     @JoinColumn(name = "test_entity_id")
     private TestEntity testEntity2;
 
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "test_entity_solo_id")
+    private TestEntity testEntity;
+
     public TestEntity2(Long id, String auth) {
         this.id = id;
         this.auth = auth;

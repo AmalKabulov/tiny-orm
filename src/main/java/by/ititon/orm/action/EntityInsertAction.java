@@ -7,7 +7,8 @@ import by.ititon.orm.testEntity.TestEntity2;
 import by.ititon.orm.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class EntityInsertAction {

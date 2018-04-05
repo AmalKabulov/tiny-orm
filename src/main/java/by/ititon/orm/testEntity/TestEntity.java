@@ -30,6 +30,9 @@ public class TestEntity {
     @OneToMany(mappedBy = "testEntity2", fetch = FetchType.EAGER)
     private Set<TestEntity2> testEntities2s = new HashSet<>();
 
+    @OneToOne(mappedBy = "testEntity",fetch = FetchType.EAGER)
+    private TestEntity2 testEntity2;
+
     public TestEntity(Long id, String name, String lastname) {
         this.id = id;
         this.name = name;
