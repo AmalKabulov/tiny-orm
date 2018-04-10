@@ -25,8 +25,6 @@ public class TestEntity {
     @Cascade(CascadeType.SAVE)
     private List<TestEntity2> testEntities2 = new ArrayList<>();
 
-
-
     @OneToMany(mappedBy = "testEntity2", fetch = FetchType.EAGER)
     private Set<TestEntity2> testEntities2s = new HashSet<>();
 

@@ -37,7 +37,7 @@ public class MetaCache {
 
         return getColumnMetaByEntity(clazz)
                 .stream()
-                .filter(meta -> meta.getField().getName().equals(fieldName))
+                .filter(meta -> meta.getFieldName().equals(fieldName))
                 .findFirst()
                 .orElse(null);
     }

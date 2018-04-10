@@ -19,7 +19,5 @@ public class Main {
         testSelectAction.genericFindAllStatementQueryCreator(TestEntity.class);
 
 
-
-
     }
 }

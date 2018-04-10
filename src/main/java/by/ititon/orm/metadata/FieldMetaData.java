@@ -1,7 +1,6 @@
 package by.ititon.orm.metadata;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,11 +9,12 @@ public class FieldMetaData {
 
     private String columnName;
 
-    private Field field;
 
-//    private String fieldName;
-//
-//    private Class<?> fieldType;
+    private String fieldName;
+
+    private Class<?> fieldType;
+
+    private Class<?> fieldGenericType;
 
 
     private Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
@@ -42,19 +42,37 @@ public class FieldMetaData {
     }
 
 
-    public Field getField() {
-        return field;
+    public String getFieldName() {
+        return fieldName;
     }
 
-    public void setField(Field field) {
-        this.field = field;
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    public Class<?> getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(Class<?> fieldType) {
+        this.fieldType = fieldType;
+    }
+
+    public Class<?> getFieldGenericType() {
+        return fieldGenericType;
+    }
+
+    public void setFieldGenericType(Class<?> fieldGenericType) {
+        this.fieldGenericType = fieldGenericType;
     }
 
     @Override
     public String toString() {
         return "FieldMetaData{" +
                 "columnName='" + columnName + '\'' +
-                ", field=" + field +
+                ", fieldName='" + fieldName + '\'' +
+                ", fieldType=" + fieldType +
+                ", fieldGenericType=" + fieldGenericType +
                 ", annotations=" + annotations +
                 '}';
     }

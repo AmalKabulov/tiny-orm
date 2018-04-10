@@ -1,11 +1,9 @@
 package by.ititon.orm;
 
-import by.ititon.orm.annotation.Column;
-import by.ititon.orm.annotation.Entity;
-import by.ititon.orm.annotation.Id;
-import by.ititon.orm.annotation.Table;
+import by.ititon.orm.annotation.*;
 import by.ititon.orm.metadata.EntityMetaData;
 import by.ititon.orm.metadata.FieldMetaData;
+import by.ititon.orm.util.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -14,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 public class MetaBuilder {
-
 
 
     public static Map<Class<?>, EntityMetaData> buildEntityMeta() {
@@ -39,8 +36,13 @@ public class MetaBuilder {
 
 
                 FieldMetaData fieldMetaData = new FieldMetaData();
-                fieldMetaData.setField(field);
+                fieldMetaData.setFieldName(field.getName());
+                fieldMetaData.setFieldType(field.getType());
 
+
+                if (field.isAnnotationPresent(OneToMany.class) || field.isAnnotationPresent(ManyToMany.class)) {
+                    fieldMetaData.setFieldGenericType(ReflectionUtil.classFromFieldGenericType(field));
+                }
 
                 if (field.isAnnotationPresent(Column.class)) {
                     Column column = field.getAnnotation(Column.class);
@@ -70,10 +72,6 @@ public class MetaBuilder {
 
 
     }
-
-
-
-
 
 
 }

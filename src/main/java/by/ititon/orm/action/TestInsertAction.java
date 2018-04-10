@@ -71,11 +71,9 @@ public class TestInsertAction {
 
         String mappedByValue = manyToMany.mappedBy();
 
-        Field field = fieldMetaData.getField();
 
-        String fieldGenericType = ReflectionUtil.getFieldGenericType(field)[0].getTypeName();
 
-        Class<?> innerTableClass = ReflectionUtil.newClass(fieldGenericType);
+        Class<?> innerTableClass =fieldMetaData.getFieldGenericType();
 
         Object innerObject = ReflectionUtil.newInstance(innerTableClass.getName());
 
